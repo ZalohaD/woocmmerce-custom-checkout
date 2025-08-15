@@ -11,6 +11,13 @@ class CheckoutController {
 
     public function handle_checkout_submit() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])):
+
+            if ( ! isset($_POST['woocommerce-process-checkout-nonce']) ||
+                ! wp_verify_nonce($_POST['woocommerce-process-checkout-nonce'], 'woocommerce-process_checkout') ) {
+                wc_add_notice(__('Security check failed. Please try again.'), 'error');
+                return;
+            }
+
             $name = sanitize_text_field($_POST['billing_first_name'] ?? '');
             $address = sanitize_text_field($_POST['billing_address_1'] ?? '');
             $email = sanitize_email($_POST['billing_email'] ?? '');
